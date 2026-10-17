@@ -5,10 +5,10 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
     - name: Checkout Device Tree
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
       with:
         path: device/samsung/a24
 
@@ -50,7 +50,7 @@ jobs:
         make recoveryimage -j4
 
     - name: Upload Recovery Image
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: recovery-a24
         path: workspace/out/target/product/a24/recovery.img
