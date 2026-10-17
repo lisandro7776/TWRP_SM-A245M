@@ -55,20 +55,21 @@ jobs:
                         pass
         EOF
 
-               source build/envsetup.sh
+        source build/envsetup.sh
         export ALLOW_MISSING_DEPENDENCIES=true
         export SELINUX_IGNORE_NEVERALLOWS=true
         export WITHOUT_STRIP=true
+
+        # Variables para la pantalla y tema de TWRP
+        export TW_THEME=portrait_hdpi
+        export TARGET_SCREEN_WIDTH=1080
+        export TARGET_SCREEN_HEIGHT=2340
+
         python3 ../fix_python.py
         echo -e "#!/bin/sh\nexit 0" > build/make/tools/check_radio_versions.py
-        
-        # Esto nos va a mostrar los nombres disponibles reales si falla
-        echo "=== LISTANDO PRODUCTOS DISPONIBLES ==="
-        ls -la device/samsung/a24
-        
-        lunch omni_a24-eng || lunch twrp_a24-eng || true
-        make recoveryimage -j$(nproc)
 
+        lunch omni_a24-eng || lunch twrp_a24-eng
+        make recoveryimage -j$(nproc)
 
     - name: Upload Recovery Image
       uses: actions/upload-artifact@v4
