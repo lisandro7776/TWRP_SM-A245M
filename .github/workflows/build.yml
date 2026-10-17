@@ -73,7 +73,7 @@ jobs:
         python3 ../fix_python.py
         echo -e "#!/bin/sh\nexit 0" > build/make/tools/check_radio_versions.py
 
-        lunch omni_a24-eng || lunch twrp_a24-eng
+        lunch omni_a24-eng
         make recoveryimage -j$(nproc)
 
     - name: Upload Recovery Image
