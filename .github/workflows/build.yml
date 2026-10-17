@@ -46,10 +46,11 @@ jobs:
        export ALLOW_MISSING_DEPENDENCIES=true
        export SELINUX_IGNORE_NEVERALLOWS=true
        export WITHOUT_STRIP=true
-       python3 fix_python.py
+       python3 ../fix_python.py
        echo -e "#!/bin/sh\nexit 0" > build/make/tools/check_radio_versions.py
        lunch omni_a24-eng || lunch twrp_a24-eng
        make recoveryimage -j$(nproc)
+
 
 
 
