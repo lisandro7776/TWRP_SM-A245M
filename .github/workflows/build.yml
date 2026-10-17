@@ -38,7 +38,7 @@ jobs:
       with:
         path: workspace/device/samsung/a24
 
-       - name: Fix Python & Build
+    - name: Fix Python & Build
       run: |
         cd workspace
 
