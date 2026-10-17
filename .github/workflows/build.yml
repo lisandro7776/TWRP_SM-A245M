@@ -10,7 +10,7 @@ jobs:
     - name: Checkout Device Tree
       uses: actions/checkout@v4
       with:
-        path: workspace/device/samsung/a24
+        path: device_tree
 
     - name: Free Up Disk Space
       uses: jlumbroso/free-disk-space@main
@@ -33,9 +33,14 @@ jobs:
         chmod a+x ~/bin/repo
         sudo ln -sf ~/bin/repo /usr/bin/repo
 
+        mkdir workspace
         cd workspace
         repo init -u https://github.com/minimal-manifest-twrp/platform_manifest_twrp_aosp.git -b twrp-11 --depth=1
         repo sync -c --no-clone-bundle --no-tags --optimized-fetch --prune --force-sync -j4
+
+        # Ahora sí, metemos el device tree adentro del workspace ya sincronizado
+        mkdir -p device/samsung/a24
+        cp -r ../device_tree/* device/samsung/a24/
 
         # Crear fix_python.py automáticamente
         cat << 'EOF' > ../fix_python.py
