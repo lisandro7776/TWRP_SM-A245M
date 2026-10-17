@@ -10,7 +10,7 @@ jobs:
     - name: Checkout Device Tree
       uses: actions/checkout@v4
       with:
-        path: device/samsung/a24
+        path: workspace/device/samsung/a24
 
     - name: Free Up Disk Space
       uses: jlumbroso/free-disk-space@main
@@ -33,7 +33,6 @@ jobs:
         chmod a+x ~/bin/repo
         sudo ln -sf ~/bin/repo /usr/bin/repo
 
-        mkdir workspace
         cd workspace
         repo init -u https://github.com/minimal-manifest-twrp/platform_manifest_twrp_aosp.git -b twrp-11 --depth=1
         repo sync -c --no-clone-bundle --no-tags --optimized-fetch --prune --force-sync -j4
