@@ -46,7 +46,7 @@ jobs:
         export ALLOW_MISSING_DEPENDENCIES=true
         export SELINUX_IGNORE_NEVERALLOWS=true
         export WITHOUT_STRIP=true
-        python3 -c "open('build/make/tools/check_radio_versions.py', 'w').write('import sys\nsys.exit(0)')"
+        echo -e "#!/bin/sh\nexit 0" > build/make/tools/check_radio_versions.py
         lunch omni_a24-eng || lunch twrp_a24-eng
         make recoveryimage -j$(nproc)
 
