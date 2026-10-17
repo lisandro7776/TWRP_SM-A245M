@@ -1,0 +1,57 @@
+name: Build TWRP for Galaxy A24
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    steps:
+    - name: Checkout Device Tree
+      uses: actions/checkout@v2
+      with:
+        path: device/samsung/a24
+
+    - name: Free Up Disk Space
+      uses: jlumbroso/free-disk-space@main
+      with:
+        tool-cache: false
+        android: true
+        dotnet: true
+        haskell: true
+        large-packages: false
+        docker-images: false
+        swap-storage: false
+
+    - name: Set up Environment & Build
+      run: |
+        export DEBIAN_FRONTEND=noninteractive
+        sudo apt-get update
+        sudo apt-get install -y bc bison build-essential ccache curl flex g++-multilib gcc-multilib git gnupg gperf imagemagick lib32ncurses5-dev lib32z1-dev libelf-dev liblz4-tool libncurses5 libncurses5-dev libsdl1.2-dev libssl-dev libxml2 libxml2-utils lzop pngcrush rsync schedtool squashfs-tools xsltproc yasm zlib1g-dev python3
+
+        mkdir -p ~/bin
+        curl https://storage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
+        chmod a+x ~/bin/repo
+        sudo ln -s ~/bin/repo /usr/bin/repo
+
+        mkdir workspace
+        cd workspace
+        repo init -u https://github.com/omnirom/android.git -b android-9.0 --depth=1
+        repo sync -c --no-clone-bundle --no-tags --optimized-fetch --prune -j4
+
+        mkdir -p device/samsung
+        mv ../device/samsung/a24 device/samsung/a24
+
+        source build/envsetup.sh
+        export ALLOW_MISSING_DEPENDENCIES=true
+        export SELINUX_IGNORE_NEVERALLOWS=true
+        export WITHOUT_STRIP=true
+        lunch omni_a24-eng
+        make recoveryimage -j4
+
+    - name: Upload Recovery Image
+      uses: actions/upload-artifact@v2
+      with:
+        name: recovery-a24
+        path: workspace/out/target/product/a24/recovery.img
+        
