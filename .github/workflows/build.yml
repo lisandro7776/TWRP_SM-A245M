@@ -48,6 +48,7 @@ jobs:
         export WITHOUT_STRIP=true
         echo -e "#!/bin/sh\nexit 0" > build/make/tools/check_radio_versions.py
         lunch omni_a24-eng || lunch twrp_a24-eng
+        python3 -c "path='build/make/tools/post_process_props.py'; open(path,'w').write(open(path).read().replace('.iteritems()', '.items()'))"
         make recoveryimage -j$(nproc)
 
     - name: Upload Recovery Image
