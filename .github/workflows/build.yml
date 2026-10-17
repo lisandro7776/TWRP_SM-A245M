@@ -35,8 +35,26 @@ jobs:
 
         mkdir workspace
         cd workspace
-        repo init -u https://github.com/minimal-manifest-twrp/platform_manifest_twrp_aosp.git -b twrp-11 --depth=1
+        repo init -u https://github.com/TeamWin/android_manifest.git -b twrp-11 --depth=1
         repo sync -c --no-clone-bundle --no-tags --optimized-fetch --prune -j4
+
+        # Crear fix_python.py automáticamente en el entorno de la nube
+        cat << 'EOF' > ../fix_python.py
+        import os, re
+        for root, dirs, files in os.walk('.'):
+            for file in files:
+                if file.endswith('.py'):
+                    path = os.path.join(root, file)
+                    try:
+                        with open(path, 'r', encoding='latin1') as f:
+                            content = f.read()
+                        content = content.replace('.iteritems()', '.items()')
+                        content = re.sub(r'\bprint\s+([^\(\n].*?)$', r'print(\1)', content, flags=re.MULTILINE)
+                        with open(path, 'w', encoding='latin1') as f:
+                            f.write(content)
+                    except Exception:
+                        pass
+        EOF
 
         source build/envsetup.sh
         export ALLOW_MISSING_DEPENDENCIES=true
