@@ -46,10 +46,12 @@ jobs:
         export ALLOW_MISSING_DEPENDENCIES=true
         export SELINUX_IGNORE_NEVERALLOWS=true
         export WITHOUT_STRIP=true
+        python3 -c "path='build/make/tools/post_process_props.py'; open(path,'w').write(open(path).read().replace('.iteritems()', '.items()'))"
+        python3 -c "path='external/clang/clang-version-inc.py'; open(path,'w').write(open(path).read().replace('print sys.stderr,', 'print(sys.stderr,'))"
         echo -e "#!/bin/sh\nexit 0" > build/make/tools/check_radio_versions.py
         lunch omni_a24-eng || lunch twrp_a24-eng
-        python3 -c "path='build/make/tools/post_process_props.py'; open(path,'w').write(open(path).read().replace('.iteritems()', '.items()'))"
         make recoveryimage -j$(nproc)
+
 
     - name: Upload Recovery Image
       uses: actions/upload-artifact@v4
