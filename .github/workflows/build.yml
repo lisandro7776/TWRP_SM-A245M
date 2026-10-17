@@ -42,14 +42,16 @@ jobs:
         mkdir -p device/samsung
         mv ../device/samsung/a24 device/samsung/a24
 
-        source build/envsetup.sh
-        export ALLOW_MISSING_DEPENDENCIES=true
-        export SELINUX_IGNORE_NEVERALLOWS=true
-        export WITHOUT_STRIP=true
-        find . -name "*.py" -exec 2to3 -w -n {} +
-        echo -e "#!/bin/sh\nexit 0" > build/make/tools/check_radio_versions.py
-        lunch omni_a24-eng || lunch twrp_a24-eng
-        make recoveryimage -j$(nproc)
+       source build/envsetup.sh
+       export ALLOW_MISSING_DEPENDENCIES=true
+       export SELINUX_IGNORE_NEVERALLOWS=true
+       export WITHOUT_STRIP=true
+       sudo apt-get install -y 2to3
+       find . -name "*.py" -exec 2to3 -w -n {} +
+       echo -e "#!/bin/sh\nexit 0" > build/make/tools/check_radio_versions.py
+       lunch omni_a24-eng || lunch twrp_a24-eng
+       make recoveryimage -j$(nproc)
+
 
 
 
