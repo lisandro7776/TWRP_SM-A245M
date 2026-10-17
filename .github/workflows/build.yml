@@ -7,11 +7,6 @@ jobs:
   build:
     runs-on: ubuntu-22.04
     steps:
-    - name: Checkout Device Tree
-      uses: actions/checkout@v4
-      with:
-        path: device_tree
-
     - name: Free Up Disk Space
       uses: jlumbroso/free-disk-space@main
       with:
@@ -23,7 +18,7 @@ jobs:
         docker-images: false
         swap-storage: false
 
-    - name: Set up Environment & Build
+    - name: Set up Environment & Sync Repo
       run: |
         sudo apt-get update
         sudo apt-get install -y bc bison build-essential ccache curl flex g++-multilib gcc-multilib git gnupg gperf imagemagick lib32ncurses5-dev lib32readline-dev lib32z1-dev libelf-dev liblz4-tool libsdl1.2-dev libssl-dev libxml2 libxml2-utils lzop pngcrush rsync schedtool squashfs-tools xsltproc zip zlib1g-dev python3 libncurses5
@@ -38,9 +33,14 @@ jobs:
         repo init -u https://github.com/minimal-manifest-twrp/platform_manifest_twrp_aosp.git -b twrp-11 --depth=1
         repo sync -c --no-clone-bundle --no-tags --optimized-fetch --prune --force-sync -j4
 
-        # Ahora sí, metemos el device tree adentro del workspace ya sincronizado
-        mkdir -p device/samsung/a24
-        cp -r ../device_tree/* device/samsung/a24/
+    - name: Checkout Device Tree into Workspace
+      uses: actions/checkout@v4
+      with:
+        path: workspace/device/samsung/a24
+
+    - name: Fix Python & Build
+      run: |
+        cd workspace
 
         # Crear fix_python.py automáticamente
         cat << 'EOF' > ../fix_python.py
