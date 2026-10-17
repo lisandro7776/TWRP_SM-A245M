@@ -46,25 +46,11 @@ jobs:
        export ALLOW_MISSING_DEPENDENCIES=true
        export SELINUX_IGNORE_NEVERALLOWS=true
        export WITHOUT_STRIP=true
-       python3 - << 'EOF'
-       import os, re
-       for r, d, fs in os.walk('.'):
-           for f in fs:
-               if f.endswith('.py'):
-                   p = os.path.join(r, f)
-                   try:
-                       with open(p, 'r', encoding='latin1') as file:
-                           c = file.read()
-                       c = c.replace('.iteritems()', '.items()')
-                       c = re.sub(r'\bprint\s+([^\(\n].*?)$', r'print(\1)', c, flags=re.MULTILINE)
-                       with open(p, 'w', encoding='latin1') as file:
-                           file.write(c)
-                   except: pass
-       EOF
+       python3 fix_python.py
        echo -e "#!/bin/sh\nexit 0" > build/make/tools/check_radio_versions.py
        lunch omni_a24-eng || lunch twrp_a24-eng
        make recoveryimage -j$(nproc)
-   
+
 
 
 
