@@ -38,7 +38,7 @@ jobs:
       with:
         path: workspace/device/samsung/a24
 
-    - name: Fix Python & Build
+        - name: Fix Python & Build
       run: |
         cd workspace
 
@@ -60,11 +60,8 @@ jobs:
                         pass
         EOF
 
-        # Solucionar la falta de la carpeta vendor/omni creando un enlace simbólico a vendor/twrp
-        mkdir -p vendor
-        if [ -d "vendor/twrp" ] && [ ! -d "vendor/omni" ]; then
-            ln -s twrp vendor/omni
-        fi
+        # Reemplazar referencias a vendor/omni por vendor/twrp en el device tree para evitar conflictos de kernel
+        find device/samsung/a24/ -type f \( -name "*.mk" -o -name "Android.bp" \) -exec sed -i 's|vendor/omni|vendor/twrp|g' {} +
 
         source build/envsetup.sh
         export ALLOW_MISSING_DEPENDENCIES=true
