@@ -45,6 +45,11 @@ jobs:
         # Reemplazar referencias a vendor/omni por vendor/twrp en el device tree para evitar conflictos de kernel
         find device/samsung/a24/ -type f \( -name "*.mk" -o -name "Android.bp" \) -exec sed -i 's|vendor/omni|vendor/twrp|g' {} +
 
+        # Asegurar que dtbo.img y dtb.img estén dentro de la carpeta prebuilt que busca el build system
+        mkdir -p device/samsung/a24/prebuilt
+        [ -f device/samsung/a24/dtbo.img ] && cp device/samsung/a24/dtbo.img device/samsung/a24/prebuilt/
+        [ -f device/samsung/a24/dtb.img ] && cp device/samsung/a24/dtb.img device/samsung/a24/prebuilt/
+
         source build/envsetup.sh
         export ALLOW_MISSING_DEPENDENCIES=true
         export SELINUX_IGNORE_NEVERALLOWS=true
