@@ -1,6 +1,6 @@
 import os, re
 
-# Carpetas críticas a corregir (evitando bionic y external que se rompen)
+# Carpetas permitidas para corregir (excluyendo bionic y external que se rompen)
 TARGET_DIRS = ['build', 'device', 'vendor', 'system']
 
 for target_dir in TARGET_DIRS:
