@@ -50,29 +50,24 @@ jobs:
         [ -f device/samsung/a24/dtbo.img ] && cp device/samsung/a24/dtbo.img device/samsung/a24/prebuilt/
         [ -f device/samsung/a24/dtb.img ] && cp device/samsung/a24/dtb.img device/samsung/a24/prebuilt/
 
-        # Restaurar la carpeta bionic por si quedó alterada en algún intento previo
-        git -C bionic checkout . 2>/dev/null || true
-
-        # Ejecutar corrección de Python SOLO en carpetas seguras (excluyendo bionic por completo)
+        # Parche quirúrgico para actualizar fs_config_generator.py de Python 2 a Python 3
         python3 -c "
-        import os, re
-        TARGET_DIRS = ['build', 'device', 'vendor', 'system']
-        for target_dir in TARGET_DIRS:
-            if not os.path.exists(target_dir):
-                continue
-            for root, dirs, files in os.walk(target_dir):
-                for file in files:
-                    if file.endswith('.py'):
-                        path = os.path.join(root, file)
-                        try:
-                            with open(path, 'r', encoding='latin1') as f:
-                                content = f.read()
-                            content = content.replace('.iteritems()', '.items()')
-                            content = re.sub(r'\bprint\s+([^\(\n\s].*?)$', r'print(\1)', content, flags=re.MULTILINE)
-                            with open(path, 'w', encoding='latin1') as f:
-                                f.write(content)
-                        except Exception:
-                            pass
+        import os
+        path = 'bionic/libc/fs_config_generator.py'
+        if os.path.exists(path):
+            with open(path, 'r', encoding='latin1') as f:
+                lines = f.readlines()
+            new_lines = []
+            for line in lines:
+                stripped = line.lstrip()
+                if stripped.startswith('print ') and not stripped.startswith('print('):
+                    indent = line[:len(line) - len(stripped)]
+                    expr = stripped[6:].rstrip('\n\r')
+                    new_lines.append(f'{indent}print({expr})\n')
+                else:
+                    new_lines.append(line)
+            with open(path, 'w', encoding='latin1') as f:
+                f.writelines(new_lines)
         "
 
         source build/envsetup.sh
