@@ -42,13 +42,38 @@ jobs:
       run: |
         cd workspace
 
-        # Reemplazar referencias a vendor/omni por vendor/twrp en el device tree para evitar conflictos de kernel
+        # Reemplazar referencias a vendor/omni por vendor/twrp en el device tree
         find device/samsung/a24/ -type f \( -name "*.mk" -o -name "Android.bp" \) -exec sed -i 's|vendor/omni|vendor/twrp|g' {} +
 
-        # Asegurar que dtbo.img y dtb.img estén dentro de la carpeta prebuilt que busca el build system
+        # Asegurar que dtbo.img y dtb.img estén en prebuilt
         mkdir -p device/samsung/a24/prebuilt
         [ -f device/samsung/a24/dtbo.img ] && cp device/samsung/a24/dtbo.img device/samsung/a24/prebuilt/
         [ -f device/samsung/a24/dtb.img ] && cp device/samsung/a24/dtb.img device/samsung/a24/prebuilt/
+
+        # Restaurar la carpeta bionic por si quedó alterada en algún intento previo
+        git -C bionic checkout . 2>/dev/null || true
+
+        # Ejecutar corrección de Python SOLO en carpetas seguras (excluyendo bionic por completo)
+        python3 -c "
+        import os, re
+        TARGET_DIRS = ['build', 'device', 'vendor', 'system']
+        for target_dir in TARGET_DIRS:
+            if not os.path.exists(target_dir):
+                continue
+            for root, dirs, files in os.walk(target_dir):
+                for file in files:
+                    if file.endswith('.py'):
+                        path = os.path.join(root, file)
+                        try:
+                            with open(path, 'r', encoding='latin1') as f:
+                                content = f.read()
+                            content = content.replace('.iteritems()', '.items()')
+                            content = re.sub(r'\bprint\s+([^\(\n\s].*?)$', r'print(\1)', content, flags=re.MULTILINE)
+                            with open(path, 'w', encoding='latin1') as f:
+                                f.write(content)
+                        except Exception:
+                            pass
+        "
 
         source build/envsetup.sh
         export ALLOW_MISSING_DEPENDENCIES=true
@@ -60,8 +85,6 @@ jobs:
         export TARGET_SCREEN_WIDTH=1080
         export TARGET_SCREEN_HEIGHT=2340
 
-        # Ejecutar el script fix_python.py que está en la raíz del device tree
-        python3 device/samsung/a24/fix_python.py
         echo -e "#!/bin/sh\nexit 0" > build/make/tools/check_radio_versions.py
 
         lunch omni_a24-eng
