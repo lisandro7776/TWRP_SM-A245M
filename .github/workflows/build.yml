@@ -40,7 +40,8 @@ jobs:
 
     - name: Fix Python & Build
       run: |
-        cd workspace
+        workspace_dir="workspace"
+        cd $workspace_dir
 
         # Reemplazar referencias a vendor/omni por vendor/twrp en el device tree
         find device/samsung/a24/ -type f \( -name "*.mk" -o -name "Android.bp" \) -exec sed -i 's|vendor/omni|vendor/twrp|g' {} +
@@ -50,25 +51,15 @@ jobs:
         [ -f device/samsung/a24/dtbo.img ] && cp device/samsung/a24/dtbo.img device/samsung/a24/prebuilt/
         [ -f device/samsung/a24/dtb.img ] && cp device/samsung/a24/dtb.img device/samsung/a24/prebuilt/
 
-        # Parche quirúrgico para actualizar fs_config_generator.py de Python 2 a Python 3
-        python3 -c "
-        import os
-        path = 'bionic/libc/fs_config_generator.py'
-        if os.path.exists(path):
-            with open(path, 'r', encoding='latin1') as f:
-                lines = f.readlines()
-            new_lines = []
-            for line in lines:
-                stripped = line.lstrip()
-                if stripped.startswith('print ') and not stripped.startswith('print('):
-                    indent = line[:len(line) - len(stripped)]
-                    expr = stripped[6:].rstrip('\n\r')
-                    new_lines.append(f'{indent}print({expr})\n')
-                else:
-                    new_lines.append(line)
-            with open(path, 'w', encoding='latin1') as f:
-                f.writelines(new_lines)
-        "
+        # Inyectar la ruta del dtb en BoardConfig.mk si no está presente para evitar el error de mkbootimg
+        board_config=$(find device/samsung/a24 -name "BoardConfig.mk" | head -n 1)
+        if [ -n "$board_config" ]; then
+            if ! grep -q "BOARD_KERNEL_DTB" "$board_config"; then
+                echo "" >> "$board_config"
+                echo "# Definir DTB para mkbootimg" >> "$board_config"
+                echo "BOARD_KERNEL_DTB := device/samsung/a24/prebuilt/dtb.img" >> "$board_config"
+            fi
+        fi
 
         source build/envsetup.sh
         export ALLOW_MISSING_DEPENDENCIES=true
