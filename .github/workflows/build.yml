@@ -50,15 +50,10 @@ jobs:
         [ -f device/samsung/a24/dtbo.img ] && cp device/samsung/a24/dtbo.img device/samsung/a24/prebuilt/
         [ -f device/samsung/a24/dtb.img ] && cp device/samsung/a24/dtb.img device/samsung/a24/prebuilt/
 
-        # Limpiar y forzar las rutas exactas de dtb y dtbo en BoardConfig.mk
+        # Descomentar y asegurar la línea de TARGET_PREBUILT_DTB en BoardConfig.mk
         board_config=$(find device/samsung/a24 -name "BoardConfig.mk" | head -n 1)
         if [ -n "$board_config" ]; then
-            sed -i '/BOARD_KERNEL_DTB/d' "$board_config"
-            sed -i '/BOARD_PREBUILT_DTBOIMAGE/d' "$board_config"
-            
-            echo "" >> "$board_config"
-            echo "BOARD_KERNEL_DTB := device/samsung/a24/dtb.img" >> "$board_config"
-            echo "BOARD_PREBUILT_DTBOIMAGE := device/samsung/a24/dtbo.img" >> "$board_config"
+            sed -i 's|#\s*TARGET_PREBUILT_DTB\s*:=|TARGET_PREBUILT_DTB :=|g' "$board_config"
         fi
 
         source build/envsetup.sh
