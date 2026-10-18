@@ -40,24 +40,24 @@ jobs:
 
     - name: Fix Python & Build
       run: |
-        workspace_dir="workspace"
-        cd $workspace_dir
+        cd workspace
 
         # Reemplazar referencias a vendor/omni por vendor/twrp en el device tree
         find device/samsung/a24/ -type f \( -name "*.mk" -o -name "Android.bp" \) -exec sed -i 's|vendor/omni|vendor/twrp|g' {} +
 
-        # Asegurar que dtbo.img y dtb.img estén en prebuilt
+        # Asegurar que dtbo.img y dtb.img estén en prebuilt y configurados en BoardConfig.mk
         mkdir -p device/samsung/a24/prebuilt
         [ -f device/samsung/a24/dtbo.img ] && cp device/samsung/a24/dtbo.img device/samsung/a24/prebuilt/
         [ -f device/samsung/a24/dtb.img ] && cp device/samsung/a24/dtb.img device/samsung/a24/prebuilt/
 
-        # Inyectar la ruta del dtb en BoardConfig.mk si no está presente para evitar el error de mkbootimg
         board_config=$(find device/samsung/a24 -name "BoardConfig.mk" | head -n 1)
         if [ -n "$board_config" ]; then
             if ! grep -q "BOARD_KERNEL_DTB" "$board_config"; then
                 echo "" >> "$board_config"
-                echo "# Definir DTB para mkbootimg" >> "$board_config"
-                echo "BOARD_KERNEL_DTB := device/samsung/a24/prebuilt/dtb.img" >> "$board_config"
+                echo "BOARD_KERNEL_DTB := device/samsung/a24/dtb.img" >> "$board_config"
+            fi
+            if ! grep -q "BOARD_PREBUILT_DTBOIMAGE" "$board_config"; then
+                echo "BOARD_PREBUILT_DTBOIMAGE := device/samsung/a24/dtbo.img" >> "$board_config"
             fi
         fi
 
