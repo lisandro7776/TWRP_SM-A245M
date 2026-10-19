@@ -17,4 +17,4 @@ recovery personalizado para Samsung a24, Android 16 en mi caso binario C, aclaro
 
 * Cable USB de buena calidad.
 
-* Firmware de respaldo o la ROM oficial correspondiente a la mano (por las dudas de que haya que recuperar el sistema si algo sale mal). *En caso de bootloop*
+* Firmware de respaldo o la ROM oficial correspondiente a la mano (por las dudas de que haya que recuperar el sistema si algo sale mal). * En caso de bootloop *
