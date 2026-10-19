@@ -2,8 +2,8 @@
 
 recovery personalizado para Samsung a24, Android 16 en mi caso binario C, aclaro que no fue probado todavía aunque suene raro.
 
-## Desabilitador de vbmeta
- También incluí un vbmeta disable por las dudas llegué a pedir
+## Deshabilitador de vbmeta
+ También incluí un vbmeta disable por las dudas llegué a ser requerido durante el flasheo.
 
 ---
 
@@ -13,8 +13,8 @@ recovery personalizado para Samsung a24, Android 16 en mi caso binario C, aclaro
 
 * PC con Windows y los drivers oficiales de Samsung instalados (Samsung USB Drivers).
 
-* Herramienta de flasheo compatible (odim V3.14)
+* Herramienta de flasheo compatible (Odim V3.14).
 
 * Cable USB de buena calidad.
 
-* Firmware de respaldo o la ROM oficial correspondiente a la mano (por las dudas de que haya que recuperar el sistema si algo sale mal). * En caso de bootloop *
+* Firmware de respaldo o la ROM oficial correspondiente a la mano (por las dudas de que haya que recuperar el sistema si algo sale mal), en caso de * bootloop (se quede en el logo de Samsung)
